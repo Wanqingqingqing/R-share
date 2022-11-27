@@ -1,1 +1,39 @@
-
+library(dplyr)
+library(tidyverse)
+#Get a subset with STATE_CODE 6 and SHRP_ID starting with 050.
+data1<-read.csv("D:\\R doucument\\R1\\iri.csv")
+data2<-filter(data1,STATE_CODE==6)
+data3<-filter(data2,stringr::str_detect(SHRP_ID,"50"))
+#Get the summary statistics of each section: min, max, and mean
+iri_sub <- data1 |>
+  group_by( STATE_CODE, SHRP_ID ) |>
+  summarise(
+    observation = n(),
+    iri_max = max(IRI),
+    iri_min = min(IRI),
+    iri_mean = mean(IRI),
+  ) |>
+  ungroup()
+iri_sub |>
+  slice_sample(n=4)
+#Sort the summarized data by mean IRI in descending order (report results for one section only)
+data4<-iri_sub
+data5=filter(data4,STATE_CODE==1)
+data6<-arrange(data5,desc(iri_mean))
+#Generate a scatter plot for the averaged IRI against the time for a selected section, 
+#and then give your interpretation of the plot
+iri_sep <- data3 |>
+  tidyr::separate(
+    col=VISIT_DATE,
+    into=c("DATE", "TIME"),
+    sep=","
+  )
+a<-
+  inner_join(
+    iri_sub,
+    iri_sep,
+    by=c("STATE_CODE", "SHRP_ID")
+  )
+library(ggplot2)
+library(ggthemes)
+ggplot(a)+geom_point(aes(DATE,iri_mean))
