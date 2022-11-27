@@ -1,0 +1,29 @@
+library(dplyr)
+library(tidyverse)
+#Get the intersection of the datasets accident and person
+accident<-read.csv('D:\\R doucument\\R1\\ACCIDENT.csv')
+person<-read.csv('D:\\R doucument\\R1\\PERSON.csv')
+a<-
+  inner_join(
+   accident,
+   person,
+   by=c("CASENUM", "PSU")
+    )
+#Tabulate the total number of observations in each injury severity (INJ_SEV)
+person_sub <- person|>
+  group_by( INJ_SEV ) |>
+  summarise(
+    observation = n(),
+  )|>
+  ungroup()
+#Merge the accident dataset with the vehicle dataset, and report the dimension 
+#of your results and number of missing values in one variable of the right dataset
+vehicle<-read.csv('D:\\R doucument\\R1\\VEHICLE.csv')
+acc_veh_left <- left_join(
+  x=accident,
+  y=vehicle,
+  by=c("CASENUM", "PSU")
+)
+dim(acc_veh_left)
+data<-acc_veh_left[,c("PSU")] #data contains one virable of acc_veh_left
+sum(is.na(data))
