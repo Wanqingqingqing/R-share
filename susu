@@ -22,18 +22,19 @@ data5=filter(data4,STATE_CODE==1)
 data6<-arrange(data5,desc(iri_mean))
 #Generate a scatter plot for the averaged IRI against the time for a selected section, 
 #and then give your interpretation of the plot
-iri_sep <- data3 |>
+iri_sep <- data1 |>
   tidyr::separate(
     col=VISIT_DATE,
     into=c("DATE", "TIME"),
     sep=","
   )
-a<-
-  inner_join(
-    iri_sub,
-    iri_sep,
-    by=c("STATE_CODE", "SHRP_ID")
-  )
+iri_sub <- iri_sep |>
+  group_by( DATE ) |>
+  summarise(
+    observation = n(),
+    iri_mean = mean(IRI),
+  ) |>
+  ungroup()
 library(ggplot2)
 library(ggthemes)
-ggplot(a)+geom_point(aes(DATE,iri_mean))
+ggplot(iri_sub)+geom_point(aes(DATE,iri_mean))
